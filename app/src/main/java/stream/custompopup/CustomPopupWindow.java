@@ -7,6 +7,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
+import android.os.Build;
+import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -15,23 +17,11 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class CustomPopupWindow {
-
-    private Activity activity;
-    private WindowManager.LayoutParams params;
-    private boolean isShow;
-    private WindowManager windowManager;
-    private ViewGroup rootView;
-    private ViewGroup relativeLayout;
-    private ViewGroup bubbleContainer;
-    private ImageView bubbleArrow;
 
     private final int animDuration = 250;
     //Animation direction constants, automatically calculated
@@ -44,38 +34,30 @@ public class CustomPopupWindow {
     private int DIRECTION = 0;
     private boolean isAnimating; //Prevent popup window from being dismissed why animating.
 
-    public CustomPopupWindow(Activity activity, List<String> contentList, List<View.OnClickListener> clickList){
+    private WindowManager.LayoutParams params;
+    private boolean isShow;
+    private WindowManager windowManager;
+    private ViewGroup rootView;
+    private View background;
+    private ViewGroup relativeLayout;
+    private ViewGroup bubbleContainer;
+    private ImageView bubbleArrow;
+    private Context mContext;
 
-        this.activity = activity;
-        windowManager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
+    public CustomPopupWindow(Context context){
 
-        initLayout(contentList, clickList);
+        mContext = context;
+        windowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
     }
 
-    public void initLayout(List<String> contentList, List<View.OnClickListener> clickList){
+    public void initLayout(int layout){
 
-        rootView = (ViewGroup) View.inflate(activity, R.layout.item_popup, null);
+        rootView = (ViewGroup) View.inflate(mContext, R.layout.item_popup, null);
+        background = (View) rootView.findViewById(R.id.background);
         relativeLayout = (ViewGroup) rootView.findViewById(R.id.relativeLayout);
         bubbleContainer = (ViewGroup) rootView.findViewById(R.id.bubble_container);
         bubbleArrow = (ImageView) rootView.findViewById(R.id.bubble_arrow);
-
-        List<View> list = new ArrayList<>();
-        for(int x=0; x<contentList.size(); x++){
-            View view = View.inflate(activity, R.layout.item_popup_layout, null);
-            TextView textView = (TextView) view.findViewById(R.id.tv_content);
-            View v_line = view.findViewById(R.id.v_line);
-            textView.setText(contentList.get(x));
-            bubbleContainer.addView(view);
-            list.add(view);
-            if(x == 0){
-                v_line.setVisibility(View.INVISIBLE);
-            }else{
-                v_line.setVisibility(View.VISIBLE);
-            }
-        }
-        for (int x=0; x<list.size(); x++){
-            list.get(x).setOnClickListener(clickList.get(x));
-        }
+        View view = View.inflate(mContext, layout, bubbleContainer);
 
         params = new WindowManager.LayoutParams();
         params.width = WindowManager.LayoutParams.MATCH_PARENT;
@@ -84,10 +66,16 @@ public class CustomPopupWindow {
         params.gravity = Gravity.NO_GRAVITY;
 
         //Dismiss popup listeners
-        rootView.setOnClickListener(new View.OnClickListener() {
+        background.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dismissPopupWindow();
+            }
+        });
+        relativeLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d("Clicked", "RelativeLayout");
             }
         });
         rootView.setOnKeyListener(new View.OnKeyListener() {
@@ -108,9 +96,9 @@ public class CustomPopupWindow {
             isAnimating = true;
             int[] arr = new int[2];
             locationView.getLocationOnScreen(arr);
-            relativeLayout.measure(0, 0);
+//            relativeLayout.measure(0, 0);
             Rect frame = new Rect();
-            activity.getWindow().getDecorView().getWindowVisibleDisplayFrame(frame);//得到状态栏高度
+            ((Activity) mContext).getWindow().getDecorView().getWindowVisibleDisplayFrame(frame);//得到状态栏高度
             int targetX = arr[0];
             int targetY = arr[1];
             int targetWidth = locationView.getWidth();
@@ -131,13 +119,19 @@ public class CustomPopupWindow {
             int popupX;
             int popupY;
             int directionY;
-            int bubbleArrowSize = dpToPx(activity, 20);
+            int bubbleArrowSize = dpToPx(mContext, 20);
 
             //Calculate vertical position. Position above or below target view.
             int calcHeight = frame.height() - getNavigationBarHeight() + frame.top;
             if (calcHeight - targetY < popupHeight)
             {
-                bubbleArrow.setRotation(0);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    bubbleArrow.setBackground(ContextCompat.getDrawable(mContext, R.drawable.bubble_arrow));
+                }
+                else
+                {
+                    bubbleArrow.setBackgroundDrawable(ContextCompat.getDrawable(mContext, R.drawable.bubble_arrow));
+                }
                 //Reset rule to prevent circular dependencies.
                 RelativeLayout.LayoutParams relativeParams = new RelativeLayout.LayoutParams(
                         RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -153,7 +147,13 @@ public class CustomPopupWindow {
             }
             else
             {
-                bubbleArrow.setRotation(180);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    bubbleArrow.setBackground(ContextCompat.getDrawable(mContext, R.drawable.bubble_arrow_top));
+                }
+                else
+                {
+                    bubbleArrow.setBackgroundDrawable(ContextCompat.getDrawable(mContext, R.drawable.bubble_arrow_top));
+                }
                 //Reset rule to prevent circular dependencies.
                 RelativeLayout.LayoutParams relativeParams = new RelativeLayout.LayoutParams(bubbleArrowSize, bubbleArrowSize);
                 relativeParams.addRule(RelativeLayout.BELOW, 0);
@@ -208,12 +208,13 @@ public class CustomPopupWindow {
             relativeLayout.setY(popupY);
             bubbleArrow.setX(arrowX);
 
-            windowManager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
+            windowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
             windowManager.addView(rootView, params);
 
             showAnimation(relativeLayout, 0, 1, animDuration, DIRECTION, true);
 
             //Set focusable to listen to keypresses and handle back button behavior.
+            rootView.requestFocus();
             rootView.setFocusable(true);
             rootView.setFocusableInTouchMode(true);
         }
@@ -337,20 +338,20 @@ public class CustomPopupWindow {
     //Display Utils.
     public int getStatusBarHeight() {
         int result = 0;
-        int resourceId = activity.getResources().getIdentifier("status_bar_height", "dimen", "android");
+        int resourceId = mContext.getResources().getIdentifier("status_bar_height", "dimen", "android");
         if (resourceId > 0) {
-            result = activity.getResources().getDimensionPixelSize(resourceId);
+            result = mContext.getResources().getDimensionPixelSize(resourceId);
         }
         return result;
     }
 
     public int getNavigationBarHeight()
     {
-        boolean hasMenuKey = ViewConfiguration.get(activity).hasPermanentMenuKey();
-        int resourceId = activity.getResources().getIdentifier("navigation_bar_height", "dimen", "android");
+        boolean hasMenuKey = ViewConfiguration.get(mContext).hasPermanentMenuKey();
+        int resourceId = mContext.getResources().getIdentifier("navigation_bar_height", "dimen", "android");
         if (resourceId > 0 && !hasMenuKey)
         {
-            return activity.getResources().getDimensionPixelSize(resourceId);
+            return mContext.getResources().getDimensionPixelSize(resourceId);
         }
         return 0;
     }
