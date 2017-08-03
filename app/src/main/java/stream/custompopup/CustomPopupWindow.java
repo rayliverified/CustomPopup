@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
@@ -17,11 +18,11 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 
-public class CustomPopupWindow {
+public class CustomPopupWindow extends PopupWindow {
 
     private final int animDuration = 250;
     //Animation direction constants, automatically calculated
@@ -33,12 +34,12 @@ public class CustomPopupWindow {
     private final int BOTTOM_RIGHT = 3;
     private int DIRECTION = 0;
     private boolean isAnimating; //Prevent popup window from being dismissed why animating.
+    private boolean animateDismiss = false; //Flag to keep track of dismiss animation.
 
     private WindowManager.LayoutParams params;
     private boolean isShow;
     private WindowManager windowManager;
     private ViewGroup rootView;
-    private View background;
     private ViewGroup relativeLayout;
     private ViewGroup bubbleContainer;
     private ImageView bubbleArrow;
@@ -48,83 +49,70 @@ public class CustomPopupWindow {
 
         mContext = context;
         windowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
+        setWidth(ViewGroup.LayoutParams.WRAP_CONTENT);
+        setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        setFocusable(true);
+        setOutsideTouchable(false);
+        setClippingEnabled(false);
     }
 
     public void initLayout(int layout){
 
         rootView = (ViewGroup) View.inflate(mContext, R.layout.item_popup, null);
-        background = (View) rootView.findViewById(R.id.background);
         relativeLayout = (ViewGroup) rootView.findViewById(R.id.relativeLayout);
         bubbleContainer = (ViewGroup) rootView.findViewById(R.id.bubble_container);
         bubbleArrow = (ImageView) rootView.findViewById(R.id.bubble_arrow);
-        View view = View.inflate(mContext, layout, bubbleContainer);
+        View.inflate(mContext, layout, bubbleContainer);
 
-        params = new WindowManager.LayoutParams();
-        params.width = WindowManager.LayoutParams.MATCH_PARENT;
-        params.height = WindowManager.LayoutParams.MATCH_PARENT;
-        params.format = PixelFormat.RGBA_8888;
-        params.gravity = Gravity.NO_GRAVITY;
-
-        //Dismiss popup listeners
-        background.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dismissPopupWindow();
-            }
-        });
-        relativeLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.d("Clicked", "RelativeLayout");
-            }
-        });
-        rootView.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if(keyCode == KeyEvent.KEYCODE_BACK)
-                {
-                    dismissPopupWindow();
-                }
-                return isShow;
-            }
-        });
+        setContentView(rootView);
     }
 
-    public void showPopupWindow(View locationView){
-        Log.i("Log.i", "showPopupWindow: "+ isAnimating);
+    public void showPopupWindow(View targetView){
+
+        animateDismiss = false;
         if(!isAnimating) {
             isAnimating = true;
+
+            //TargetView measurements.
             int[] arr = new int[2];
-            locationView.getLocationOnScreen(arr);
-//            relativeLayout.measure(0, 0);
-            Rect frame = new Rect();
-            ((Activity) mContext).getWindow().getDecorView().getWindowVisibleDisplayFrame(frame);//得到状态栏高度
+            targetView.getLocationOnScreen(arr);
             int targetX = arr[0];
             int targetY = arr[1];
-            int targetWidth = locationView.getWidth();
+            int targetWidth = targetView.getWidth();
+            int targetHeight = targetView.getHeight();
+
+            //Screen dimensions.
+            Rect frame = new Rect();
+            ((Activity) mContext).getWindow().getDecorView().getWindowVisibleDisplayFrame(frame);
             int screenWidth = frame.width();
             int screenHeight = frame.height();
+
+            //Popup Window measurements.
+            relativeLayout.measure(0, 0);
             int popupWidth = relativeLayout.getMeasuredWidth();
             int popupHeight = relativeLayout.getMeasuredHeight();
 
-//                Log.d("Target Y", String.valueOf(targetY));
-//                Log.d("Frame Top", String.valueOf(frame.top));
-//                Log.d("Frame Bottom", String.valueOf(frame.bottom));
-//                Log.d("Popup Height", String.valueOf(popupHeight));
-//                Log.d("ScreenWidth", String.valueOf(screenWidth));
-//                Log.d("ScreenHeight", String.valueOf(screenHeight));
-//                Log.d("Calc", String.valueOf(screenHeight - targetY));
-//                Log.d("Navigation Bar", String.valueOf(getNavigationBarHeight()));
+            Log.d("Target Y", String.valueOf(targetY));
+            Log.d("Frame Top", String.valueOf(frame.top));
+            Log.d("Frame Bottom", String.valueOf(frame.bottom));
+            Log.d("Popup Height", String.valueOf(popupHeight));
+            Log.d("ScreenWidth", String.valueOf(screenWidth));
+            Log.d("ScreenHeight", String.valueOf(screenHeight));
+            Log.d("Calc", String.valueOf(screenHeight - targetY));
+            Log.d("Navigation Bar", String.valueOf(getNavigationBarHeight()));
 
             int popupX;
             int popupY;
-            int directionY;
+            int directionY; //Flag to display popup above or below target.
             int bubbleArrowSize = dpToPx(mContext, 20);
 
             //Calculate vertical position. Position above or below target view.
             int calcHeight = frame.height() - getNavigationBarHeight() + frame.top;
             if (calcHeight - targetY < popupHeight)
             {
+                //Position arrow logic
+                //Switch arrow drawable to match elevation appearance and direction.
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                     bubbleArrow.setBackground(ContextCompat.getDrawable(mContext, R.drawable.bubble_arrow));
                 }
@@ -141,7 +129,8 @@ public class CustomPopupWindow {
                 relativeParams1.addRule(RelativeLayout.BELOW, bubbleContainer.getId());
                 bubbleArrow.setLayoutParams(relativeParams1);
                 relativeLayout.updateViewLayout(bubbleArrow, relativeParams1);
-                popupY = targetY - popupHeight - bubbleArrowSize;
+                //Set popup Y position.
+                popupY = targetY - popupHeight;
                 //Save directionY.
                 directionY = TOP;
             }
@@ -154,7 +143,6 @@ public class CustomPopupWindow {
                 {
                     bubbleArrow.setBackgroundDrawable(ContextCompat.getDrawable(mContext, R.drawable.bubble_arrow_top));
                 }
-                //Reset rule to prevent circular dependencies.
                 RelativeLayout.LayoutParams relativeParams = new RelativeLayout.LayoutParams(bubbleArrowSize, bubbleArrowSize);
                 relativeParams.addRule(RelativeLayout.BELOW, 0);
                 bubbleArrow.setLayoutParams(relativeParams);
@@ -163,20 +151,19 @@ public class CustomPopupWindow {
                 relativeParams1.addRule(RelativeLayout.BELOW, bubbleArrow.getId());
                 bubbleContainer.setLayoutParams(relativeParams1);
                 relativeLayout.updateViewLayout(bubbleContainer, relativeParams1);
-                popupY = targetY - frame.top + locationView.getHeight();
-                //Save directionY.
+                popupY = targetY + targetHeight;
                 directionY = BOTTOM;
             }
 
-            //Calculate horizontal position. Position arrow in middle of target view.
+            //Calculate horizontal position to position arrow in middle of target view.
             int arrowX;
-            int calcX = targetX + targetWidth - popupWidth;
             int calcWidth = targetWidth;
             //If targetview is wider than popup window, set arrow to middle of popup window.
             if (targetWidth > popupWidth)
             {
                 calcWidth = popupWidth;
             }
+            int calcX = targetX + targetWidth - popupWidth;
             if (calcX < 0)
             {
                 popupX = 0;
@@ -192,7 +179,7 @@ public class CustomPopupWindow {
             }
             else
             {
-                popupX = targetX + locationView.getWidth() - popupWidth;
+                popupX = targetX + targetView.getWidth() - popupWidth;
                 arrowX = popupWidth - calcWidth/2 - bubbleArrowSize/2;
                 if (directionY == TOP)
                 {
@@ -203,41 +190,11 @@ public class CustomPopupWindow {
                     DIRECTION = TOP_RIGHT;
                 }
             }
-
-            relativeLayout.setX(popupX);
-            relativeLayout.setY(popupY);
             bubbleArrow.setX(arrowX);
 
-            windowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
-            windowManager.addView(rootView, params);
-
+            showAtLocation(targetView, Gravity.NO_GRAVITY, popupX, popupY);
             showAnimation(relativeLayout, 0, 1, animDuration, DIRECTION, true);
-
-            //Set focusable to listen to keypresses and handle back button behavior.
-            rootView.requestFocus();
-            rootView.setFocusable(true);
-            rootView.setFocusableInTouchMode(true);
         }
-    }
-
-    public void dismissPopupWindow(){
-        if(!isAnimating) {
-            isAnimating = true;
-            isShow = false;
-            hideAnimation(relativeLayout, 0.95f, 1, animDuration / 3, DIRECTION, true);
-        }
-    }
-
-    public WindowManager.LayoutParams getLayoutParams(){
-        return params;
-    }
-
-    public ViewGroup getLayout(){
-        return relativeLayout;
-    }
-
-    public boolean isShow(){
-        return isShow;
     }
 
     private void showAnimation(final View view, float start, final float end, int duration, final int direction, final boolean isWhile) {
@@ -285,6 +242,19 @@ public class CustomPopupWindow {
         va.start();
     }
 
+    @Override
+    public void dismiss() {
+
+        //Run hide animation first. Then hide when animation is finished.
+        if(animateDismiss && !isAnimating) {
+            super.dismiss();
+        }
+        else
+        {
+            hideAnimation(relativeLayout, 0.95f, 1, animDuration / 3, DIRECTION, true);
+        }
+    }
+
     public void hideAnimation(final View view, float start, final float end, int duration, final int direction, final boolean isWhile){
 
         ValueAnimator va = ValueAnimator.ofFloat(start, end).setDuration(duration);
@@ -323,16 +293,29 @@ public class CustomPopupWindow {
                 if(isWhile){
                     hideAnimation(view, end, 0f, animDuration, direction, false);
                 }else{
+                    animateDismiss = true;
+                    isAnimating = false;
                     try {
-                        windowManager.removeViewImmediate(rootView);
+                        dismiss();
                     }catch (Exception e){
                         e.printStackTrace();
                     }
-                    isAnimating = false;
                 }
             }
         });
         va.start();
+    }
+
+    public WindowManager.LayoutParams getLayoutParams(){
+        return params;
+    }
+
+    public ViewGroup getLayout(){
+        return relativeLayout;
+    }
+
+    public boolean isShow(){
+        return isShow;
     }
 
     //Display Utils.

@@ -6,12 +6,6 @@
     android:background="@null"
     android:clipChildren="false">
 
-    <View
-        android:id="@+id/background"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@null"/>
-
     <RelativeLayout
         android:id="@+id/relativeLayout"
         android:layout_width="wrap_content"
