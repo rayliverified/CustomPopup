@@ -93,6 +93,7 @@ public class CustomPopupWindow extends PopupWindow {
             int popupWidth = relativeLayout.getMeasuredWidth();
             int popupHeight = relativeLayout.getMeasuredHeight();
 
+            Log.d("Target X", String.valueOf(targetX));
             Log.d("Target Y", String.valueOf(targetY));
             Log.d("Frame Top", String.valueOf(frame.top));
             Log.d("Frame Bottom", String.valueOf(frame.bottom));
@@ -121,14 +122,14 @@ public class CustomPopupWindow extends PopupWindow {
                     bubbleArrow.setBackgroundDrawable(ContextCompat.getDrawable(mContext, R.drawable.bubble_arrow));
                 }
                 //Reset rule to prevent circular dependencies.
-                RelativeLayout.LayoutParams relativeParams = new RelativeLayout.LayoutParams(
-                        RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                RelativeLayout.LayoutParams relativeParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
                 relativeParams.addRule(RelativeLayout.BELOW, 0);
                 bubbleContainer.setLayoutParams(relativeParams);
                 RelativeLayout.LayoutParams relativeParams1 = new RelativeLayout.LayoutParams(bubbleArrowSize, bubbleArrowSize);
                 relativeParams1.addRule(RelativeLayout.BELOW, bubbleContainer.getId());
                 bubbleArrow.setLayoutParams(relativeParams1);
                 relativeLayout.updateViewLayout(bubbleArrow, relativeParams1);
+                relativeLayout.setClipChildren(false);
                 //Set popup Y position.
                 popupY = targetY - popupHeight;
                 //Save directionY.
@@ -146,28 +147,29 @@ public class CustomPopupWindow extends PopupWindow {
                 RelativeLayout.LayoutParams relativeParams = new RelativeLayout.LayoutParams(bubbleArrowSize, bubbleArrowSize);
                 relativeParams.addRule(RelativeLayout.BELOW, 0);
                 bubbleArrow.setLayoutParams(relativeParams);
-                RelativeLayout.LayoutParams relativeParams1 = new RelativeLayout.LayoutParams(
-                        RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                RelativeLayout.LayoutParams relativeParams1 = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
                 relativeParams1.addRule(RelativeLayout.BELOW, bubbleArrow.getId());
                 bubbleContainer.setLayoutParams(relativeParams1);
                 relativeLayout.updateViewLayout(bubbleContainer, relativeParams1);
+                relativeLayout.setClipChildren(false);
                 popupY = targetY + targetHeight;
                 directionY = BOTTOM;
             }
 
             //Calculate horizontal position to position arrow in middle of target view.
             int arrowX;
-            int calcWidth = targetWidth;
             //If targetview is wider than popup window, set arrow to middle of popup window.
+            int targetCalcWidth = targetWidth;
             if (targetWidth > popupWidth)
             {
-                calcWidth = popupWidth;
+                targetCalcWidth = popupWidth;
             }
             int calcX = targetX + targetWidth - popupWidth;
             if (calcX < 0)
             {
                 popupX = 0;
-                arrowX = targetX + calcWidth/2 - bubbleArrowSize/2;
+                //TODO Calculating arrow position shifts right by targetX/25 due to unexplained left drift. Why?
+                arrowX = targetX + targetX/20 + targetCalcWidth/2 - bubbleArrowSize/2;
                 if (directionY == TOP)
                 {
                     DIRECTION = BOTTOM_LEFT;
@@ -179,8 +181,8 @@ public class CustomPopupWindow extends PopupWindow {
             }
             else
             {
-                popupX = targetX + targetView.getWidth() - popupWidth;
-                arrowX = popupWidth - calcWidth/2 - bubbleArrowSize/2;
+                popupX = calcX;
+                arrowX = popupWidth - targetCalcWidth/2 - bubbleArrowSize/2;
                 if (directionY == TOP)
                 {
                     DIRECTION = BOTTOM_RIGHT;
