@@ -92,7 +92,7 @@
             android:background="@drawable/linedivider"
             android:layout_weight="1"/>
     </LinearLayout>
-    <!--List View with Keywords-->
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/stat_list"
         android:layout_width="match_parent"

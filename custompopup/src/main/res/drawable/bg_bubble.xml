@@ -5,7 +5,7 @@
         android:topRightRadius="40px"
         android:bottomLeftRadius="40px"
         android:bottomRightRadius="40px"/>
-    <solid android:color="#ffffff"/>
+    <solid android:color="#FFFFFF"/>
     <padding
         android:left="2dp"
         android:top="2dp"

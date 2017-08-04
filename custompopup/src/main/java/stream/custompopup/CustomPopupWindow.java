@@ -148,23 +148,35 @@ public class CustomPopupWindow extends PopupWindow {
                 direction = TOP;
             }
 
-            //Calculate horizontal position to position arrow in middle of target view.
+            //Calculate horizontal position.
             //If targetview is wider than popup window, set arrow to middle of popup window.
             int targetCalcWidth = targetWidth;
             if (targetWidth > popupWidth)
             {
                 targetCalcWidth = popupWidth;
             }
+            //If targetview is narrower than arrow, offset x position of popup to fit arrow.
+            int offset = 0;
+            if (targetWidth < bubbleArrowSize * 2)
+            {
+                offset = targetWidth;
+            }
+
             int calcX = targetX + targetWidth - popupWidth;
             if (calcX < 0)
             {
                 popupX = 0;
                 arrowX = targetX + targetCalcWidth/2 - bubbleArrowSize/2;
             }
-            else
+            else if (targetX + targetWidth >= screenWidth) //Do not offset if doing so would push popup off screen.
             {
                 popupX = calcX;
-                arrowX = popupWidth - targetCalcWidth/2 - bubbleArrowSize/2;
+                arrowX = popupWidth - targetCalcWidth/2 - bubbleArrowSize/2 - offset;
+            }
+            else
+            {
+                popupX = calcX + offset;
+                arrowX = popupWidth - targetCalcWidth/2 - bubbleArrowSize/2 - offset;
             }
             bubbleArrow.setX(arrowX);
 
