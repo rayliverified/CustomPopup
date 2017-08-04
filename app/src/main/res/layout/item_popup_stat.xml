@@ -52,7 +52,6 @@
         android:id="@+id/divider"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
         android:layout_below="@+id/sentiment_container"
         android:orientation="horizontal">
 
@@ -90,4 +89,12 @@
             android:layout_weight="1"/>
     </LinearLayout>
     <!--List View with Keywords-->
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/stat_list"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_below="@+id/divider"
+        android:overScrollMode="never"
+        android:scrollbars="vertical"
+        android:scrollbarAlwaysDrawVerticalTrack="true"/>
 </RelativeLayout>

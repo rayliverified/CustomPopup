@@ -5,4 +5,9 @@
     <color name="colorPrimaryLight">#4dafff</color>
     <color name="colorAccent">#cc3332</color>
     <color name="chat_segment">#C3C3C3</color>
+
+    <color name="white">#FFFFFF</color>
+    <color name="textPrimary">#2D2D2D</color>
+    <color name="textSecondary">#8C8C8C</color>
+    <color name="button_normal">#bbbbbb</color>
 </resources>
