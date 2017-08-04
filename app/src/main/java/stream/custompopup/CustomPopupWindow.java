@@ -5,15 +5,12 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.PixelFormat;
 import android.graphics.Rect;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
@@ -28,11 +25,8 @@ public class CustomPopupWindow extends PopupWindow {
     //Animation direction constants, automatically calculated
     private final int TOP = 0;
     private final int BOTTOM = 1;
-    private final int TOP_LEFT = 0;
-    private final int TOP_RIGHT = 1;
-    private final int BOTTOM_LEFT = 2;
-    private final int BOTTOM_RIGHT = 3;
-    private int DIRECTION = 0;
+    private int direction = 0;
+    private int arrowX = 0;
     private boolean isAnimating; //Prevent popup window from being dismissed why animating.
     private boolean animateDismiss = false; //Flag to keep track of dismiss animation.
 
@@ -105,7 +99,6 @@ public class CustomPopupWindow extends PopupWindow {
 
             int popupX;
             int popupY;
-            int directionY; //Flag to display popup above or below target.
             int bubbleArrowSize = dpToPx(mContext, 20);
 
             //Calculate vertical position. Position above or below target view.
@@ -132,8 +125,7 @@ public class CustomPopupWindow extends PopupWindow {
                 relativeLayout.setClipChildren(false);
                 //Set popup Y position.
                 popupY = targetY - popupHeight;
-                //Save directionY.
-                directionY = TOP;
+                direction = BOTTOM;
             }
             else
             {
@@ -153,11 +145,10 @@ public class CustomPopupWindow extends PopupWindow {
                 relativeLayout.updateViewLayout(bubbleContainer, relativeParams1);
                 relativeLayout.setClipChildren(false);
                 popupY = targetY + targetHeight;
-                directionY = BOTTOM;
+                direction = TOP;
             }
 
             //Calculate horizontal position to position arrow in middle of target view.
-            int arrowX;
             //If targetview is wider than popup window, set arrow to middle of popup window.
             int targetCalcWidth = targetWidth;
             if (targetWidth > popupWidth)
@@ -168,63 +159,38 @@ public class CustomPopupWindow extends PopupWindow {
             if (calcX < 0)
             {
                 popupX = 0;
-                //TODO Calculating arrow position shifts right by targetX/25 due to unexplained left drift. Why?
-                arrowX = targetX + targetX/20 + targetCalcWidth/2 - bubbleArrowSize/2;
-                if (directionY == TOP)
-                {
-                    DIRECTION = BOTTOM_LEFT;
-                }
-                else
-                {
-                    DIRECTION = TOP_LEFT;
-                }
+                arrowX = targetX + targetCalcWidth/2 - bubbleArrowSize/2;
             }
             else
             {
                 popupX = calcX;
                 arrowX = popupWidth - targetCalcWidth/2 - bubbleArrowSize/2;
-                if (directionY == TOP)
-                {
-                    DIRECTION = BOTTOM_RIGHT;
-                }
-                else
-                {
-                    DIRECTION = TOP_RIGHT;
-                }
             }
             bubbleArrow.setX(arrowX);
 
             showAtLocation(targetView, Gravity.NO_GRAVITY, popupX, popupY);
-            showAnimation(relativeLayout, 0, 1, animDuration, DIRECTION, true);
+            showAnimation(relativeLayout, 0, 1, animDuration, direction, arrowX, true);
         }
     }
 
-    private void showAnimation(final View view, float start, final float end, int duration, final int direction, final boolean isWhile) {
+    private void showAnimation(final View view, float start, final float end, int duration, final int direction, final int xposition, final boolean isWhile) {
 
         ValueAnimator va = ValueAnimator.ofFloat(start, end).setDuration(duration);
         va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 float value = (float) animation.getAnimatedValue();
-                int pivotX = 0;
                 int pivotY = 0;
                 switch (direction)
                 {
-                    case TOP_LEFT:
-                        pivotX = 0;
+                    case TOP:
+                        //Pivot Y = 0;
                         break;
-                    case TOP_RIGHT:
-                        pivotX = view.getWidth();
-                        break;
-                    case BOTTOM_LEFT:
-                        pivotY = view.getHeight();
-                        break;
-                    case BOTTOM_RIGHT:
-                        pivotX = view.getWidth();
+                    case BOTTOM:
                         pivotY = view.getHeight();
                         break;
                 }
-                view.setPivotX(pivotX);
+                view.setPivotX(xposition);
                 view.setPivotY(pivotY);
                 view.setScaleX(value);
                 view.setScaleY(value);
@@ -235,7 +201,7 @@ public class CustomPopupWindow extends PopupWindow {
             @Override
             public void onAnimationEnd(Animator animation) {
                 if (isWhile) {
-                    showAnimation(view, end, 0.95f, animDuration / 3, direction, false);
+                    showAnimation(view, end, 0.95f, animDuration / 3, direction, arrowX, false);
                 }else{
                     isAnimating = false;
                 }
@@ -253,36 +219,28 @@ public class CustomPopupWindow extends PopupWindow {
         }
         else
         {
-            hideAnimation(relativeLayout, 0.95f, 1, animDuration / 3, DIRECTION, true);
+            hideAnimation(relativeLayout, 0.95f, 1, animDuration / 3, direction, arrowX, true);
         }
     }
 
-    public void hideAnimation(final View view, float start, final float end, int duration, final int direction, final boolean isWhile){
+    public void hideAnimation(final View view, float start, final float end, int duration, final int direction, final int xposition, final boolean isWhile){
 
         ValueAnimator va = ValueAnimator.ofFloat(start, end).setDuration(duration);
         va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 float value = (float) animation.getAnimatedValue();
-                int pivotX = 0;
                 int pivotY = 0;
                 switch (direction)
                 {
-                    case TOP_LEFT:
-                        pivotX = 0;
+                    case TOP:
+                        //Pivot Y = 0;
                         break;
-                    case TOP_RIGHT:
-                        pivotX = view.getWidth();
-                        break;
-                    case BOTTOM_LEFT:
-                        pivotY = view.getHeight();
-                        break;
-                    case BOTTOM_RIGHT:
-                        pivotX = view.getWidth();
+                    case BOTTOM:
                         pivotY = view.getHeight();
                         break;
                 }
-                view.setPivotX(pivotX);
+                view.setPivotX(xposition);
                 view.setPivotY(pivotY);
                 view.setScaleX(value);
                 view.setScaleY(value);
@@ -293,7 +251,7 @@ public class CustomPopupWindow extends PopupWindow {
             @Override
             public void onAnimationEnd(Animator animation) {
                 if(isWhile){
-                    hideAnimation(view, end, 0f, animDuration, direction, false);
+                    hideAnimation(view, end, 0f, animDuration, direction, arrowX, false);
                 }else{
                     animateDismiss = true;
                     isAnimating = false;
