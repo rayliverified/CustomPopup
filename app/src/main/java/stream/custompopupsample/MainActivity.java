@@ -1,4 +1,4 @@
-package stream.custompopup;
+package stream.custompopupsample;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +12,8 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import stream.custompopup.CustomPopupWindow;
+
 public class MainActivity extends AppCompatActivity {
 
     private CustomPopupWindow customPopupWindow;
@@ -22,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         customPopupWindow = new CustomPopupWindow(MainActivity.this);
-        customPopupWindow.initLayout(R.layout.item_popup_stat);
+        customPopupWindow.initLayout(R.layout.item_popup_layout);
         ViewGroup customPopupView = customPopupWindow.getLayout();
         TextView title = (TextView) customPopupView.findViewById(R.id.title);
         title.setText("Happy Days!");

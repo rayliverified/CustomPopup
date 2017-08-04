@@ -1,4 +1,4 @@
-package stream.custompopup;
+package stream.custompopupsample;
 
 import android.content.Context;
 import android.graphics.Color;

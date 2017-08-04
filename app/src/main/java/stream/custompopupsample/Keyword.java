@@ -1,4 +1,4 @@
-package stream.custompopup;
+package stream.custompopupsample;
 
 public class Keyword {
 
