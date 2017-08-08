@@ -29,6 +29,7 @@ public class CustomPopupWindow extends PopupWindow {
     private int arrowX = 0;
     private boolean isAnimating; //Prevent popup window from being dismissed why animating.
     private boolean animateDismiss = false; //Flag to keep track of dismiss animation.
+    private boolean isShow = false; //Flag to return popup status.
 
     private ViewGroup rootView;
     private ViewGroup relativeLayout;
@@ -61,6 +62,7 @@ public class CustomPopupWindow extends PopupWindow {
     public void showPopupWindow(View targetView){
 
         animateDismiss = false;
+        isShow = true;
         if(!isAnimating) {
             isAnimating = true;
 
@@ -221,6 +223,7 @@ public class CustomPopupWindow extends PopupWindow {
     @Override
     public void dismiss() {
 
+        isShow = false;
         //Run hide animation first. Then hide when animation is finished.
         if(animateDismiss && !isAnimating) {
             super.dismiss();
@@ -277,6 +280,8 @@ public class CustomPopupWindow extends PopupWindow {
     public ViewGroup getLayout(){
         return relativeLayout;
     }
+
+    public boolean isShow() { return isShow; }
 
     //Display Utils.
     public int getStatusBarHeight() {
