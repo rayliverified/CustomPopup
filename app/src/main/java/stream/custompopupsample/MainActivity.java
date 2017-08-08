@@ -1,6 +1,8 @@
 package stream.custompopupsample;
 
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,10 +15,13 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import stream.custompopup.CustomPopupWindow;
+import stream.slimchart.SlimChart;
+import stream.slimchart.Stat;
 
 public class MainActivity extends AppCompatActivity {
 
     private CustomPopupWindow customPopupWindow;
+    private SlimChart statScore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,12 +46,25 @@ public class MainActivity extends AppCompatActivity {
         statRecyclerView.setAdapter(keywordAdapter);
         statRecyclerView.setLayoutManager(layoutManager);
 
+        statScore = (SlimChart) customPopupView.findViewById(R.id.stat_score);
+        statScore.setText("32%");
+        statScore.setStartAnimationDuration(1600);
+        statScore.setStacked(true);
+        ArrayList<Stat> statList = new ArrayList<Stat>();
+        for (int i = 0; i < KeywordList.size(); i++)
+        {
+            statList.add(new Stat(Math.abs(KeywordList.get(i).getScore()), Color.HSVToColor(GetStatColor((int) (KeywordList.get(i).getScore()*100 + 100)/2))));
+        }
+        statScore.setStatList(statList);
+        TextView statType = (TextView) customPopupView.findViewById(R.id.stat_type);
+        statType.setText("POSITIVE");
 
         Button button = (Button) findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 customPopupWindow.showPopupWindow(v);
+                statScore.playStartAnimation();
             }
         });
         ImageView imageView = (ImageView) findViewById(R.id.imageView);
@@ -54,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 customPopupWindow.showPopupWindow(v);
+                statScore.playStartAnimation();
             }
         });
 
@@ -62,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 customPopupWindow.showPopupWindow(v);
+                statScore.playStartAnimation();
             }
         });
 
@@ -70,7 +90,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 customPopupWindow.showPopupWindow(v);
+                statScore.playStartAnimation();
             }
         });
+    }
+
+    public float[] GetStatColor(int hue)
+    {
+        float H = (float) ((float) hue * 1.3); // Hue (note 0.4 = Green, see huge chart below)
+        float S = (float) 1; // Saturation
+        float B = (float) 0.9; // Brightness
+
+        return new float[]{H, S, B};
     }
 }

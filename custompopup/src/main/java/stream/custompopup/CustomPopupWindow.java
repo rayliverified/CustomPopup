@@ -30,9 +30,6 @@ public class CustomPopupWindow extends PopupWindow {
     private boolean isAnimating; //Prevent popup window from being dismissed why animating.
     private boolean animateDismiss = false; //Flag to keep track of dismiss animation.
 
-    private WindowManager.LayoutParams params;
-    private boolean isShow;
-    private WindowManager windowManager;
     private ViewGroup rootView;
     private ViewGroup relativeLayout;
     private ViewGroup bubbleContainer;
@@ -42,7 +39,6 @@ public class CustomPopupWindow extends PopupWindow {
     public CustomPopupWindow(Context context){
 
         mContext = context;
-        windowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
         setWidth(ViewGroup.LayoutParams.WRAP_CONTENT);
         setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
 
@@ -278,16 +274,8 @@ public class CustomPopupWindow extends PopupWindow {
         va.start();
     }
 
-    public WindowManager.LayoutParams getLayoutParams(){
-        return params;
-    }
-
     public ViewGroup getLayout(){
         return relativeLayout;
-    }
-
-    public boolean isShow(){
-        return isShow;
     }
 
     //Display Utils.

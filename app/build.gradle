@@ -19,8 +19,12 @@ android {
 }
 
 dependencies {
+    repositories {
+        maven { url 'https://jitpack.io' }
+    }
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile project(':custompopup')
+    compile 'com.github.searchy2:CustomSlimChart:1.2'
 
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support:recyclerview-v7:25.3.1'

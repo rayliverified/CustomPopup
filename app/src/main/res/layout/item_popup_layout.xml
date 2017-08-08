@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="250dp"
     android:layout_height="match_parent"
     android:padding="12dp">
@@ -35,21 +36,26 @@
         android:layout_below="@+id/message"
         android:orientation="horizontal">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <stream.slimchart.SlimChart
+            android:id="@+id/stat_score"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
             android:layout_margin="12dp"
-            android:text="-32%"
-            android:textSize="34sp"
-            android:textColor="@color/textPrimary"/>
+            app:text="32%"
+            app:textColor="@color/textPrimary"
+            app:strokeWidth="8dp"
+            app:roundedEdges="true"/>
 
         <TextView
+            android:id="@+id/stat_type"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="POSITIVE"
             android:textSize="18sp"
-            android:textColor="@color/textSecondary"/>
+            android:textColor="@color/textSecondary"
+            android:textStyle="italic"
+            android:textAllCaps="true"/>
     </LinearLayout>
 
     <LinearLayout
