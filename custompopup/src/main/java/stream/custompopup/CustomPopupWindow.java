@@ -6,6 +6,8 @@ import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.InsetDrawable;
 import android.os.Build;
 import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
@@ -26,6 +28,7 @@ public class CustomPopupWindow extends PopupWindow {
     private final int BOTTOM = 1;
     private int direction = 0;
     private int arrowX = 0;
+    private int offsetPadding = 2; //Padding for bg_bubble to not clip elevation.
     private boolean isAnimating; //Prevent popup window from being dismissed why animating.
     private boolean animateDismiss = false; //Flag to keep track of dismiss animation.
     private boolean isShow = false; //Flag to return popup status.
@@ -45,15 +48,17 @@ public class CustomPopupWindow extends PopupWindow {
         setFocusable(true);
         setOutsideTouchable(false);
         setClippingEnabled(false);
-        setBackgroundDrawable(ContextCompat.getDrawable(mContext, R.drawable.bg_transparent));
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1) {
+            setBackgroundDrawable(ContextCompat.getDrawable(mContext, R.drawable.bg_transparent));
+        }
     }
 
     public void initLayout(int layout){
 
         rootView = (ViewGroup) View.inflate(mContext, R.layout.item_popup, null);
-        relativeLayout = (ViewGroup) rootView.findViewById(R.id.relativeLayout);
-        bubbleContainer = (ViewGroup) rootView.findViewById(R.id.bubble_container);
-        bubbleArrow = (ImageView) rootView.findViewById(R.id.bubble_arrow);
+        relativeLayout = rootView.findViewById(R.id.relativeLayout);
+        bubbleContainer = rootView.findViewById(R.id.bubble_container);
+        bubbleArrow = rootView.findViewById(R.id.bubble_arrow);
         View.inflate(mContext, layout, bubbleContainer);
 
         setContentView(rootView);
@@ -81,7 +86,7 @@ public class CustomPopupWindow extends PopupWindow {
             int screenHeight = frame.height();
 
             //Popup Window measurements.
-            relativeLayout.measure(0, 0);
+            this.relativeLayout.measure(0, 0);
             int popupWidth = relativeLayout.getMeasuredWidth();
             int popupHeight = relativeLayout.getMeasuredHeight();
 
@@ -99,6 +104,7 @@ public class CustomPopupWindow extends PopupWindow {
             int popupX;
             int popupY;
             int bubbleArrowSize = dpToPx(mContext, 20);
+            int paddingOffset = dpToPx(mContext, offsetPadding);
 
             //Calculate vertical position. Position above or below target view.
             int calcHeight = frame.height() - getNavigationBarHeight() + frame.top;
@@ -106,16 +112,12 @@ public class CustomPopupWindow extends PopupWindow {
             {
                 //Position arrow logic
                 //Switch arrow drawable to match elevation appearance and direction.
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                    bubbleArrow.setBackground(ContextCompat.getDrawable(mContext, R.drawable.bubble_arrow));
-                }
-                else
-                {
-                    bubbleArrow.setBackgroundDrawable(ContextCompat.getDrawable(mContext, R.drawable.bubble_arrow));
-                }
+                bubbleArrow.setBackground(ContextCompat.getDrawable(mContext, R.drawable.bubble_arrow));
                 //Reset rule to prevent circular dependencies.
                 RelativeLayout.LayoutParams relativeParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
                 relativeParams.addRule(RelativeLayout.BELOW, 0);
+                //Create padding offset for drawable to prevent elevation from being clipped.
+                bubbleContainer.setBackground(new InsetDrawable(ContextCompat.getDrawable(mContext, R.drawable.bg_bubble), paddingOffset, paddingOffset, paddingOffset, 0));
                 bubbleContainer.setLayoutParams(relativeParams);
                 RelativeLayout.LayoutParams relativeParams1 = new RelativeLayout.LayoutParams(bubbleArrowSize, bubbleArrowSize);
                 relativeParams1.addRule(RelativeLayout.BELOW, bubbleContainer.getId());
@@ -128,16 +130,11 @@ public class CustomPopupWindow extends PopupWindow {
             }
             else
             {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                    bubbleArrow.setBackground(ContextCompat.getDrawable(mContext, R.drawable.bubble_arrow_top));
-                }
-                else
-                {
-                    bubbleArrow.setBackgroundDrawable(ContextCompat.getDrawable(mContext, R.drawable.bubble_arrow_top));
-                }
+                bubbleArrow.setBackground(ContextCompat.getDrawable(mContext, R.drawable.bubble_arrow_top));
                 RelativeLayout.LayoutParams relativeParams = new RelativeLayout.LayoutParams(bubbleArrowSize, bubbleArrowSize);
                 relativeParams.addRule(RelativeLayout.BELOW, 0);
                 bubbleArrow.setLayoutParams(relativeParams);
+                bubbleContainer.setBackground(new InsetDrawable(ContextCompat.getDrawable(mContext, R.drawable.bg_bubble), paddingOffset, 0, paddingOffset, paddingOffset));
                 RelativeLayout.LayoutParams relativeParams1 = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
                 relativeParams1.addRule(RelativeLayout.BELOW, bubbleArrow.getId());
                 bubbleContainer.setLayoutParams(relativeParams1);

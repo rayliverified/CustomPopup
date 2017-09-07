@@ -6,9 +6,4 @@
         android:bottomLeftRadius="40px"
         android:bottomRightRadius="40px"/>
     <solid android:color="#FFFFFF"/>
-    <padding
-        android:left="2dp"
-        android:top="2dp"
-        android:right="2dp"
-        android:bottom="2dp"/>
 </shape>

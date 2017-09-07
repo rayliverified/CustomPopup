@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
         customPopupWindow = new CustomPopupWindow(MainActivity.this);
         customPopupWindow.initLayout(R.layout.item_popup_layout);
         ViewGroup customPopupView = customPopupWindow.getLayout();
-        TextView title = (TextView) customPopupView.findViewById(R.id.title);
+        TextView title = customPopupView.findViewById(R.id.title);
         title.setText("Happy Days!");
 
         ArrayList<Keyword> KeywordList = new ArrayList<>();
@@ -39,13 +39,13 @@ public class MainActivity extends AppCompatActivity {
         KeywordList.add(new Keyword("VeryLongWord", (float) -0.83));
         KeywordList.add(new Keyword("Test", (float) 0.64));
 
-        RecyclerView statRecyclerView = (RecyclerView) customPopupView.findViewById(R.id.stat_list);
+        RecyclerView statRecyclerView = customPopupView.findViewById(R.id.stat_list);
         KeywordAdapter keywordAdapter = new KeywordAdapter(MainActivity.this, KeywordList);
         LinearLayoutManager layoutManager = new LinearLayoutManager(MainActivity.this);
         statRecyclerView.setAdapter(keywordAdapter);
         statRecyclerView.setLayoutManager(layoutManager);
 
-        statScore = (SlimChart) customPopupView.findViewById(R.id.stat_score);
+        statScore = customPopupView.findViewById(R.id.stat_score);
         statScore.setText("32%");
         statScore.setStartAnimationDuration(1600);
         statScore.setStacked(true);
@@ -55,10 +55,10 @@ public class MainActivity extends AppCompatActivity {
             statList.add(new Stat(Math.abs(KeywordList.get(i).getScore()), Color.HSVToColor(GetStatColor((int) (KeywordList.get(i).getScore()*100 + 100)/2))));
         }
         statScore.setStatList(statList);
-        TextView statType = (TextView) customPopupView.findViewById(R.id.stat_type);
+        TextView statType = customPopupView.findViewById(R.id.stat_type);
         statType.setText("POSITIVE");
 
-        Button button = (Button) findViewById(R.id.button);
+        Button button = findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
                 statScore.playStartAnimation();
             }
         });
-        ImageView imageView = (ImageView) findViewById(R.id.imageView);
+        ImageView imageView = findViewById(R.id.imageView);
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        ImageView imageView1 = (ImageView) findViewById(R.id.imageView1);
+        ImageView imageView1 = findViewById(R.id.imageView1);
         imageView1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        ImageView imageView2 = (ImageView) findViewById(R.id.imageView2);
+        ImageView imageView2 = findViewById(R.id.imageView2);
         imageView2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
