@@ -164,7 +164,7 @@ public class CustomPopupWindow extends PopupWindow {
                 popupX = 0;
                 arrowX = targetX + targetCalcWidth/2 - bubbleArrowSize/2;
             }
-            else if (targetX + popupWidth >= screenWidth) //Do not offset if doing so would push popup off screen.
+            else if (targetX + targetWidth >= screenWidth) //Do not offset if doing so would push popup off screen.
             {
                 popupX = calcX;
                 arrowX = popupWidth - targetCalcWidth/2 - bubbleArrowSize/2 - offset;
