@@ -14,7 +14,6 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
@@ -46,6 +45,7 @@ public class CustomPopupWindow extends PopupWindow {
         setFocusable(true);
         setOutsideTouchable(false);
         setClippingEnabled(false);
+        setBackgroundDrawable(ContextCompat.getDrawable(mContext, R.drawable.bg_transparent));
     }
 
     public void initLayout(int layout){
@@ -89,6 +89,7 @@ public class CustomPopupWindow extends PopupWindow {
             Log.d("Target Y", String.valueOf(targetY));
             Log.d("Frame Top", String.valueOf(frame.top));
             Log.d("Frame Bottom", String.valueOf(frame.bottom));
+            Log.d("Popup Width", String.valueOf(popupWidth));
             Log.d("Popup Height", String.valueOf(popupHeight));
             Log.d("ScreenWidth", String.valueOf(screenWidth));
             Log.d("ScreenHeight", String.valueOf(screenHeight));
@@ -161,12 +162,12 @@ public class CustomPopupWindow extends PopupWindow {
             }
 
             int calcX = targetX + targetWidth - popupWidth;
-            if (calcX < 0)
+            if (calcX < 0) //Set Popup X position to 0 if centering would push popup off screen.
             {
                 popupX = 0;
                 arrowX = targetX + targetCalcWidth/2 - bubbleArrowSize/2;
             }
-            else if (targetX + targetWidth >= screenWidth) //Do not offset if doing so would push popup off screen.
+            else if (targetX + popupWidth >= screenWidth) //Do not offset if doing so would push popup off screen.
             {
                 popupX = calcX;
                 arrowX = popupWidth - targetCalcWidth/2 - bubbleArrowSize/2 - offset;
