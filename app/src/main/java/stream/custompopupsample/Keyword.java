@@ -5,7 +5,7 @@ public class Keyword {
     String k_keyword;
     float k_score;
 
-    public Keyword() {};
+    public Keyword() {}
 
     public Keyword(String keyword, float score) {
         k_keyword = keyword;

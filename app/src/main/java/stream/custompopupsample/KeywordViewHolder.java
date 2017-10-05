@@ -19,8 +19,8 @@ public class KeywordViewHolder extends RecyclerView.ViewHolder {
     public KeywordViewHolder(View itemView) {
         super(itemView);
 
-        mKeyword = (TextView) itemView.findViewById(R.id.word);
-        mScore = (TextView) itemView.findViewById(R.id.word_score);
+        mKeyword = itemView.findViewById(R.id.word);
+        mScore = itemView.findViewById(R.id.word_score);
 
         mContext = itemView.getContext();
     }
