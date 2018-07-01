@@ -5,12 +5,12 @@ group='com.github.searchy2'
 version = '1.9'
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
     buildToolsVersion "27.0.3"
 
     defaultConfig {
         minSdkVersion 19
-        targetSdkVersion 27
+        targetSdkVersion 28
     }
     buildTypes {
         release {
@@ -25,5 +25,5 @@ dependencies {
         maven { url "https://maven.google.com" }
     }
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:27.1.0'
+    implementation 'androidx.appcompat:appcompat:1.0.0-alpha3'
 }
