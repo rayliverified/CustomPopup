@@ -6,7 +6,6 @@ version = '2.0'
 
 android {
     compileSdkVersion 28
-    buildToolsVersion "27.0.3"
 
     defaultConfig {
         minSdkVersion 19
@@ -25,5 +24,5 @@ dependencies {
         maven { url "https://maven.google.com" }
     }
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.0.0-alpha3'
+    implementation 'androidx.appcompat:appcompat:1.0.0'
 }

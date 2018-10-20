@@ -2,7 +2,6 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 28
-    buildToolsVersion "27.0.3"
     defaultConfig {
         applicationId "stream.custompopupsample"
         minSdkVersion 19
@@ -25,8 +24,8 @@ dependencies {
     }
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation project(':custompopup')
-    implementation 'com.github.searchy2:CustomSlimChart:1.7'
+    implementation 'com.github.searchy2:CustomSlimChart:1.8'
 
-    implementation 'androidx.appcompat:appcompat:1.0.0-alpha3'
-    implementation 'androidx.recyclerview:recyclerview:1.0.0-alpha3'
+    implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.0.0'
 }
