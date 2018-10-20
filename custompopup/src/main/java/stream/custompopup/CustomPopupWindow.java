@@ -6,10 +6,8 @@ import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.InsetDrawable;
 import android.os.Build;
-import androidx.core.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -19,6 +17,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
+
+import androidx.core.content.ContextCompat;
 
 public class CustomPopupWindow extends PopupWindow {
 
@@ -39,7 +39,7 @@ public class CustomPopupWindow extends PopupWindow {
     private ImageView bubbleArrow;
     private Context mContext;
 
-    public CustomPopupWindow(Context context){
+    public CustomPopupWindow(Context context) {
 
         mContext = context;
         setWidth(ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -53,7 +53,13 @@ public class CustomPopupWindow extends PopupWindow {
         }
     }
 
-    public void initLayout(int layout){
+    public static int dpToPx(Context context, int dp) {
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        int px = Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
+        return px;
+    }
+
+    public void initLayout(int layout) {
 
         rootView = (ViewGroup) View.inflate(mContext, R.layout.item_popup, null);
         relativeLayout = rootView.findViewById(R.id.relativeLayout);
@@ -64,11 +70,11 @@ public class CustomPopupWindow extends PopupWindow {
         setContentView(rootView);
     }
 
-    public void showPopupWindow(View targetView){
+    public void showPopupWindow(View targetView) {
 
         animateDismiss = false;
         isShow = true;
-        if(!isAnimating) {
+        if (!isAnimating) {
             isAnimating = true;
 
             //TargetView measurements.
@@ -108,8 +114,7 @@ public class CustomPopupWindow extends PopupWindow {
 
             //Calculate vertical position. Position above or below target view.
             int calcHeight = frame.height() - getNavigationBarHeight() + frame.top;
-            if (calcHeight - targetY < popupHeight)
-            {
+            if (calcHeight - targetY < popupHeight) {
                 //Position arrow logic
                 //Switch arrow drawable to match elevation appearance and direction.
                 bubbleArrow.setBackground(ContextCompat.getDrawable(mContext, R.drawable.bubble_arrow));
@@ -127,9 +132,7 @@ public class CustomPopupWindow extends PopupWindow {
                 //Set popup Y position.
                 popupY = targetY - popupHeight;
                 direction = BOTTOM;
-            }
-            else
-            {
+            } else {
                 bubbleArrow.setBackground(ContextCompat.getDrawable(mContext, R.drawable.bubble_arrow_top));
                 RelativeLayout.LayoutParams relativeParams = new RelativeLayout.LayoutParams(bubbleArrowSize, bubbleArrowSize);
                 relativeParams.addRule(RelativeLayout.BELOW, 0);
@@ -147,14 +150,12 @@ public class CustomPopupWindow extends PopupWindow {
             //Calculate horizontal position.
             //If targetview is wider than popup window, set arrow to middle of popup window.
             int targetCalcWidth = targetWidth;
-            if (targetWidth > popupWidth)
-            {
+            if (targetWidth > popupWidth) {
                 targetCalcWidth = popupWidth;
             }
             //If targetview is narrower than arrow, offset x position of popup to fit arrow.
             int offset = 0;
-            if (targetWidth < bubbleArrowSize * 2)
-            {
+            if (targetWidth < bubbleArrowSize * 2) {
                 offset = targetWidth;
             }
 
@@ -162,17 +163,14 @@ public class CustomPopupWindow extends PopupWindow {
             if (calcX < 0) //Set Popup X position to 0 if centering would push popup off screen.
             {
                 popupX = 0;
-                arrowX = targetX + targetCalcWidth/2 - bubbleArrowSize/2;
-            }
-            else if (targetX + targetWidth >= screenWidth) //Do not offset if doing so would push popup off screen.
+                arrowX = targetX + targetCalcWidth / 2 - bubbleArrowSize / 2;
+            } else if (targetX + targetWidth >= screenWidth) //Do not offset if doing so would push popup off screen.
             {
                 popupX = calcX;
-                arrowX = popupWidth - targetCalcWidth/2 - bubbleArrowSize/2 - offset;
-            }
-            else
-            {
+                arrowX = popupWidth - targetCalcWidth / 2 - bubbleArrowSize / 2 - offset;
+            } else {
                 popupX = calcX + offset;
-                arrowX = popupWidth - targetCalcWidth/2 - bubbleArrowSize/2 - offset;
+                arrowX = popupWidth - targetCalcWidth / 2 - bubbleArrowSize / 2 - offset;
             }
             bubbleArrow.setX(arrowX);
 
@@ -189,8 +187,7 @@ public class CustomPopupWindow extends PopupWindow {
             public void onAnimationUpdate(ValueAnimator animation) {
                 float value = (float) animation.getAnimatedValue();
                 int pivotY = 0;
-                switch (direction)
-                {
+                switch (direction) {
                     case TOP:
                         //Pivot Y = 0;
                         break;
@@ -210,7 +207,7 @@ public class CustomPopupWindow extends PopupWindow {
             public void onAnimationEnd(Animator animation) {
                 if (isWhile) {
                     showAnimation(view, end, 0.95f, animDuration / 3, direction, arrowX, false);
-                }else{
+                } else {
                     isAnimating = false;
                 }
             }
@@ -223,16 +220,14 @@ public class CustomPopupWindow extends PopupWindow {
 
         isShow = false;
         //Run hide animation first. Then hide when animation is finished.
-        if(animateDismiss && !isAnimating) {
+        if (animateDismiss && !isAnimating) {
             super.dismiss();
-        }
-        else
-        {
+        } else {
             hideAnimation(relativeLayout, 0.95f, 1, animDuration / 3, direction, arrowX, true);
         }
     }
 
-    public void hideAnimation(final View view, float start, final float end, int duration, final int direction, final int xposition, final boolean isWhile){
+    public void hideAnimation(final View view, float start, final float end, int duration, final int direction, final int xposition, final boolean isWhile) {
 
         ValueAnimator va = ValueAnimator.ofFloat(start, end).setDuration(duration);
         va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -240,8 +235,7 @@ public class CustomPopupWindow extends PopupWindow {
             public void onAnimationUpdate(ValueAnimator animation) {
                 float value = (float) animation.getAnimatedValue();
                 int pivotY = 0;
-                switch (direction)
-                {
+                switch (direction) {
                     case TOP:
                         //Pivot Y = 0;
                         break;
@@ -259,14 +253,14 @@ public class CustomPopupWindow extends PopupWindow {
         va.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                if(isWhile){
+                if (isWhile) {
                     hideAnimation(view, end, 0f, animDuration, direction, arrowX, false);
-                }else{
+                } else {
                     animateDismiss = true;
                     isAnimating = false;
                     try {
                         dismiss();
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
@@ -275,11 +269,13 @@ public class CustomPopupWindow extends PopupWindow {
         va.start();
     }
 
-    public ViewGroup getLayout(){
+    public ViewGroup getLayout() {
         return relativeLayout;
     }
 
-    public boolean isShow() { return isShow; }
+    public boolean isShow() {
+        return isShow;
+    }
 
     //Display Utils.
     public int getStatusBarHeight() {
@@ -291,20 +287,12 @@ public class CustomPopupWindow extends PopupWindow {
         return result;
     }
 
-    public int getNavigationBarHeight()
-    {
+    public int getNavigationBarHeight() {
         boolean hasMenuKey = ViewConfiguration.get(mContext).hasPermanentMenuKey();
         int resourceId = mContext.getResources().getIdentifier("navigation_bar_height", "dimen", "android");
-        if (resourceId > 0 && !hasMenuKey)
-        {
+        if (resourceId > 0 && !hasMenuKey) {
             return mContext.getResources().getDimensionPixelSize(resourceId);
         }
         return 0;
-    }
-
-    public static int dpToPx(Context context, int dp) {
-        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
-        int px = Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
-        return px;
     }
 }

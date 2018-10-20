@@ -2,9 +2,6 @@ package stream.custompopupsample;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -13,6 +10,9 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import stream.custompopup.CustomPopupWindow;
 import stream.slimchart.SlimChart;
 import stream.slimchart.Stat;
@@ -50,9 +50,8 @@ public class MainActivity extends AppCompatActivity {
         statScore.setStartAnimationDuration(1600);
         statScore.setStacked(true);
         ArrayList<Stat> statList = new ArrayList<Stat>();
-        for (int i = 0; i < KeywordList.size(); i++)
-        {
-            statList.add(new Stat(Math.abs(KeywordList.get(i).getScore()), Color.HSVToColor(GetStatColor((int) (KeywordList.get(i).getScore()*100 + 100)/2))));
+        for (int i = 0; i < KeywordList.size(); i++) {
+            statList.add(new Stat(Math.abs(KeywordList.get(i).getScore()), Color.HSVToColor(GetStatColor((int) (KeywordList.get(i).getScore() * 100 + 100) / 2))));
         }
         statScore.setStatList(statList);
         TextView statType = customPopupView.findViewById(R.id.stat_type);
@@ -94,8 +93,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public float[] GetStatColor(int hue)
-    {
+    public float[] GetStatColor(int hue) {
         float H = (float) ((float) hue * 1.3); // Hue (note 0.4 = Green, see huge chart below)
         float S = (float) 1; // Saturation
         float B = (float) 0.9; // Brightness

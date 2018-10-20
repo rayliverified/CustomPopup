@@ -10,29 +10,29 @@
         android:id="@+id/word"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingTop="2dp"
-        android:paddingBottom="2dp"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
         android:layout_toLeftOf="@+id/word_score"
-        android:gravity="center"
-        android:text="Keyword"
-        android:textSize="14sp"
-        android:textColor="@color/white"
         android:background="@drawable/bg_rectangle_stat"
+        android:gravity="center"
+        android:maxLines="1"
+        android:paddingLeft="8dp"
+        android:paddingTop="2dp"
+        android:paddingRight="8dp"
+        android:paddingBottom="2dp"
         android:singleLine="true"
-        android:maxLines="1"/>
+        android:text="Keyword"
+        android:textColor="@color/white"
+        android:textSize="14sp"/>
 
     <TextView
         android:id="@+id/word_score"
         android:layout_width="110dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="12dp"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:text="+0.78"
-        android:textSize="14sp"
-        android:textColor="@color/textSecondary"
+        android:layout_marginLeft="12dp"
+        android:maxLines="1"
         android:singleLine="true"
-        android:maxLines="1"/>
+        android:text="+0.78"
+        android:textColor="@color/textSecondary"
+        android:textSize="14sp"/>
 </RelativeLayout>
